@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Leeder Management | Boston Apartments</title>
+<style>
+  :root{
+    --bg:#fbfbf9; --ink:#12161b; --text:#242a31; --dim:#5b6470;
+    --teal:#0e6d80; --teal-dark:#0a5261; --sky:#e8f2f4; --line:#e3e1da; --white:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} *{transition:none !important; animation:none !important;} }
+  body{background:var(--bg); color:var(--text); font-size:1.15rem; line-height:1.65;
+    font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;}
+  img{display:block; width:100%;}
+  a{color:var(--teal-dark);}
+  .skip{position:absolute; left:-999px; top:0; background:var(--ink); color:#fff; padding:1rem 2rem; z-index:99;}
+  .skip:focus{left:0;}
+
+  /* NAV */
+  nav{position:sticky; top:0; z-index:30; background:rgba(251,251,249,.94); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line); display:flex; align-items:center; gap:1.6rem; padding:.8rem 4vw; flex-wrap:wrap;}
+  .wordmark{font-weight:800; font-size:1.15rem; letter-spacing:.01em; color:var(--ink); text-decoration:none; display:inline-block; padding:.65rem .1rem; max-width:85px;}
+  .wordmark span{color:var(--teal);}
+  nav .links{display:flex; gap:.4rem; flex-wrap:wrap;}
+  nav .links a{color:var(--text); text-decoration:none; font-size:1.125rem; font-weight:500;
+    padding:.8rem 1.1rem; border-radius:99px;}
+  nav .links a:hover{background:var(--sky);}
+  nav .links a[aria-current]{text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:6px; text-decoration-color:var(--teal);}
+  nav .links a:focus-visible{outline:3px solid var(--teal); outline-offset:3px;}
+  nav .apply{margin-left:auto;}
+  .btn{display:inline-block; font-size:1.15rem; font-weight:700; padding:.85rem 1.7rem; border-radius:10px;
+    text-decoration:none; border:2px solid transparent; cursor:pointer;}
+  .btn.primary{background:var(--teal); color:#fff;}
+  .btn.primary:hover{background:var(--teal-dark);}
+  .btn.light{background:#fff; color:var(--ink); border-color:#fff;}
+  .btn.outline{border-color:var(--ink); color:var(--ink);}
+  .btn:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+  .applylink{margin-left:auto; font-weight:500; font-size:1.125rem; color:var(--teal-dark); text-underline-offset:5px; padding:.8rem .6rem;}
+  .quietlink{color:#dbe4e8; font-size:1.15rem; text-underline-offset:5px; padding:.85rem .4rem; align-self:center;}
+  .applylink:focus-visible,.quietlink:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+
+  html{color-scheme:light dark;}
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0f1317; --ink:#0b0e12; --text:#e4e9ee; --dim:#aab4bf;
+      --teal:#1487a0; --teal-dark:#8fd8e6; --sky:#152730; --line:#2a333d; --white:#181f27;
+    }
+    nav{background:rgba(15,19,23,.94);}
+    .wordmark{color:#f2f6f9;}
+    nav .links a{color:#e4e9ee;}
+    h2,.prop-head h1{color:#f2f6f9;}
+    .card h3{color:#f2f6f9;}
+    .card .chip{background:rgba(15,19,23,.9); color:#f2f6f9;}
+    td.price{color:#f2f6f9;}
+    thead th{background:#0c5666;}
+    .btn.light{background:#f2f6f9; color:#12161b; border-color:#f2f6f9;}
+    .btn.outline{border-color:#e4e9ee; color:#e4e9ee;}
+    .livebadge{background:#2c3640; color:#cfd8e0;}
+    .livebadge.live{background:#1f8a52; color:#fff;}
+    .values,footer{background:#0b0e12;}
+    .kicker{background:#0c5666;}
+    .btn.primary{background:#0c5666;}
+    .btn.primary:hover{background:#0a4552;}
+    .appform legend{color:#f2f6f9;}
+  }
+
+  /* Explicit light ladder: html[data-light="dusk"|"night"] mirrors the dark palette */
+  html[data-light="dusk"], html[data-light="night"]{
+    --bg:#0f1317; --ink:#0b0e12; --text:#e4e9ee; --dim:#aab4bf;
+    --teal:#1487a0; --teal-dark:#8fd8e6; --sky:#152730; --line:#2a333d; --white:#181f27;
+    color-scheme:dark;
+  }
+  html[data-light="dusk"] nav, html[data-light="night"] nav{background:rgba(15,19,23,.94);}
+  html[data-light="dusk"] .wordmark, html[data-light="night"] .wordmark{color:#f2f6f9;}
+  html[data-light="dusk"] nav .links a, html[data-light="night"] nav .links a{color:#e4e9ee;}
+  html[data-light="dusk"] h2, html[data-light="night"] h2,
+  html[data-light="dusk"] .prop-head h1, html[data-light="night"] .prop-head h1{color:#f2f6f9;}
+  html[data-light="dusk"] .card h3, html[data-light="night"] .card h3{color:#f2f6f9;}
+  html[data-light="dusk"] .card .chip, html[data-light="night"] .card .chip{background:rgba(15,19,23,.9); color:#f2f6f9;}
+  html[data-light="dusk"] td.price, html[data-light="night"] td.price{color:#f2f6f9;}
+  html[data-light="dusk"] thead th, html[data-light="night"] thead th{background:#0c5666;}
+  html[data-light="dusk"] .btn.light, html[data-light="night"] .btn.light{background:#f2f6f9; color:#12161b; border-color:#f2f6f9;}
+  html[data-light="dusk"] .btn.outline, html[data-light="night"] .btn.outline{border-color:#e4e9ee; color:#e4e9ee;}
+  html[data-light="dusk"] .livebadge, html[data-light="night"] .livebadge{background:#2c3640; color:#cfd8e0;}
+  html[data-light="dusk"] .livebadge.live, html[data-light="night"] .livebadge.live{background:#1f8a52; color:#fff;}
+  html[data-light="dusk"] .values, html[data-light="night"] .values,
+  html[data-light="dusk"] footer, html[data-light="night"] footer{background:#0b0e12;}
+  html[data-light="dusk"] .kicker, html[data-light="night"] .kicker{background:#0c5666;}
+  html[data-light="dusk"] .btn.primary, html[data-light="night"] .btn.primary{background:#0c5666;}
+  html[data-light="dusk"] .btn.primary:hover, html[data-light="night"] .btn.primary:hover{background:#0a4552;}
+  html[data-light="dusk"] .appform legend, html[data-light="night"] .appform legend{color:#f2f6f9;}
+  html[data-light="day"]{color-scheme:light;}
+  .page{display:none;} .page.active{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  /* HERO: image and text never overlap; text sits on a solid ink panel */
+  .hero{background:#12161b;}
+  .hero>img{width:100%; height:33vh; min-height:170px; object-fit:cover;}
+  .hero .inner{padding:1.8rem 5vw 2.4rem; max-width:66rem;}
+  .brandlogo{height:56px; width:auto; display:block; margin-bottom:1.1rem;}
+  .kicker{display:inline-block; background:var(--teal); color:#fff; font-weight:700; font-size:1.125rem;
+    letter-spacing:.14em; text-transform:uppercase; padding:.35rem .9rem; border-radius:6px; margin-bottom:1.1rem;}
+  h1{font-size:clamp(2.2rem,4.2vw,3.4rem); line-height:1.06; color:#fff; font-weight:800; letter-spacing:-.015em;}
+  .hero p{color:#e8edf0; font-size:1.35rem; max-width:48ch; margin-top:1.2rem;}
+  .cta-row{display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;}
+  @media (max-width:700px){
+    nav{position:static; gap:.4rem .8rem; padding:.5rem 4vw .6rem;}
+    .wordmark{padding:.5rem .1rem;}
+    nav .links{gap:.1rem .2rem;}
+    nav .links a{padding:.55rem .7rem;}
+    .applylink{padding:.55rem .5rem;}
+    .hero>img{height:24vh; min-height:140px;}
+    .hero .inner{padding:1.2rem 5vw 1.6rem;}
+    .brandlogo{height:44px; margin-bottom:.8rem;}
+    .hero h1{font-size:1.9rem;}
+    .hero p{font-size:1.15rem; margin-top:.7rem;}
+    .cta-row{margin-top:1rem;}
+    .prop-head{padding-top:1.2rem; gap:1.2rem;}
+    .prop-head h1{font-size:1.9rem;}
+    .prop-head p{font-size:1.15rem;}
+    section{padding:2.5rem 5vw;}
+  }
+
+  section{padding:4.5rem 5vw;}
+  h2{font-size:clamp(1.9rem,3.4vw,2.6rem); font-weight:800; letter-spacing:-.01em; color:var(--ink);}
+  .sub{color:var(--dim); font-size:1.25rem; max-width:64ch; margin-top:.7rem;}
+
+  /* HOME CARDS */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.8rem; margin-top:2.6rem;}
+  .card{background:var(--white); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    text-decoration:none; color:inherit; display:flex; flex-direction:column;
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-5px); box-shadow:0 14px 30px rgba(15,40,50,.14);}
+  .card:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+  .card .imgwrap{aspect-ratio:16/10; overflow:hidden; background:var(--ink); position:relative;}
+  .card img{height:100%; object-fit:cover; transition:transform .4s ease;}
+  .card:hover img{transform:scale(1.045);}
+  .card .chip{position:absolute; top:1rem; left:1rem; background:rgba(255,255,255,.92); color:var(--ink);
+    font-weight:700; font-size:1.125rem; padding:.3rem .8rem; border-radius:99px;}
+  .card .body{padding:1.4rem 1.5rem 1.6rem;}
+  .card h3{font-size:1.45rem; font-weight:800; color:var(--ink);}
+  .card p{color:var(--dim); margin:.5rem 0 .9rem; font-size:1.125rem;}
+  .card .from{font-weight:700; color:var(--teal-dark); font-size:1.15rem;}
+  .card .rents{display:block; font-weight:700; color:var(--teal-dark); font-size:1.125rem; line-height:1.6; margin-top:.2rem;}
+
+  /* VALUE ROW */
+  .values{background:var(--ink); color:#dfe5ea;}
+  .values h2{color:#fff;}
+  .values .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:2rem; margin-top:2.2rem;}
+  .values h3{color:#7fd0de; font-size:1.2rem; margin-bottom:.35rem;}
+
+  /* PROPERTY PAGES */
+  .prop-head{display:grid; grid-template-columns:1.15fr .85fr; gap:2.5rem; align-items:center; padding:3.5rem 5vw 1rem;}
+  @media (max-width:920px){ .prop-head{grid-template-columns:1fr;} }
+  .prop-head img{border-radius:16px; aspect-ratio:16/11; object-fit:cover; box-shadow:0 16px 36px rgba(15,40,50,.18);}
+  .prop-head .kicker{margin-bottom:.9rem;}
+  .prop-head h1{color:var(--ink); font-size:clamp(2.2rem,4.6vw,3.6rem);}
+  .prop-head p{margin-top:1rem; font-size:1.25rem; color:var(--dim); max-width:52ch;}
+
+  .gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; margin-top:2rem;}
+  .gallery button{border:0; padding:0; border-radius:12px; overflow:hidden; cursor:pointer; aspect-ratio:4/3;
+    background:#dfe3e6; transition:transform .15s ease;}
+  .gallery button:hover{transform:scale(1.02);}
+  .gallery button:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+  .gallery img{height:100%; object-fit:cover;}
+  .gal-hint{color:var(--dim); font-size:1.125rem; margin-top:.8rem;}
+
+  /* RENTS */
+  .rents-wrap{background:var(--sky); border-radius:20px; padding:2.5rem 2.5rem 2rem; margin-top:1rem;}
+  table{width:100%; max-width:46rem; border-collapse:collapse; background:var(--white); border-radius:12px;
+    overflow:hidden; box-shadow:0 4px 14px rgba(15,40,50,.08); margin-top:1.2rem;}
+  th,td{padding:1rem 1.4rem; text-align:left; font-size:1.15rem;}
+  thead th{background:var(--teal); color:#fff; font-weight:700;}
+  tbody tr+tr{border-top:1px solid var(--line);}
+  td.price{font-weight:800; white-space:nowrap; color:var(--ink);}
+  .livebadge{display:inline-block; margin-top:1.1rem; font-size:1.125rem; font-weight:600;
+    padding:.4rem 1rem; border-radius:99px; background:#d5dce2; color:#39434d;}
+  .livebadge.live{background:#177245; color:#fff;}
+
+  .amen{display:flex; flex-wrap:wrap; gap:.8rem; margin-top:1.6rem; max-width:64rem;}
+  .amen span{background:var(--white); border:1px solid var(--line); border-radius:99px; padding:.55rem 1.2rem;
+    font-size:1.125rem; font-weight:600;}
+
+  footer{background:var(--ink); color:#c9d1d9; padding:3.5rem 5vw;}
+  footer .cols{display:flex; gap:4rem; flex-wrap:wrap;}
+  footer a{color:#7fd0de; display:inline-block; padding:.55rem 0;}
+  footer .wordmark{color:#fff; display:block; margin-bottom:.8rem;}
+  .note{font-size:1.125rem; color:#75808c; margin-top:2rem;}
+
+  /* APPLY FORM */
+  .appform{max-width:52rem;}
+  .appform fieldset{border:1px solid var(--line); border-radius:14px; padding:1.4rem 1.5rem 1.6rem; margin-top:1.8rem; background:var(--white);}
+  .appform legend{font-weight:800; font-size:1.3rem; color:var(--ink); padding:0 .5rem;}
+  .appform .frow{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem 1.2rem; margin-top:.9rem;}
+  .appform label{display:block; font-weight:600; font-size:1.125rem; color:var(--text);}
+  .appform input,.appform select,.appform textarea{display:block; width:100%; margin-top:.35rem;
+    font:inherit; font-size:1.125rem; color:var(--text); background:var(--bg);
+    border:2px solid var(--dim); border-radius:8px; padding:.6rem .8rem; min-height:48px;}
+  .appform textarea{min-height:96px;}
+  .appform input:focus-visible,.appform select:focus-visible,.appform textarea:focus-visible{outline:4px solid var(--teal); outline-offset:2px;}
+  .appform .hint{font-size:1.125rem; color:var(--dim); margin-top:.5rem;}
+  .appform .actions{display:flex; gap:1rem; flex-wrap:wrap; margin-top:2rem;}
+  .appform .privacy{background:var(--sky); border-radius:12px; padding:1rem 1.3rem; margin-top:1.4rem; font-size:1.125rem;}
+  @media print{
+    nav,footer,#lightbox,.skip,.appform .actions,.appform .privacy,.apply-intro .gal-hint{display:none !important;}
+    .page{display:none !important;} #page-apply{display:block !important;}
+    body{background:#fff; color:#000; font-size:11pt;}
+    .appform fieldset{break-inside:avoid; border:1px solid #000; background:#fff; margin-top:.6rem; padding:.6rem .8rem;}
+    .appform legend{font-size:12pt;}
+    .appform label{font-size:10pt;}
+    .appform input,.appform select,.appform textarea{border:none; border-bottom:1px solid #000; border-radius:0; min-height:auto; padding:.15rem .2rem; background:#fff; color:#000;}
+    section{padding:.5rem 0;}
+    .prop-head,.rents-wrap{display:none;}
+  }
+
+  /* LIGHTBOX */
+  #lightbox{position:fixed; inset:0; background:rgba(8,10,12,.94); z-index:50; display:none;
+    flex-direction:column; align-items:center; justify-content:center; padding:3vh 4vw;}
+  #lightbox.open{display:flex;}
+  #lightbox img{max-width:92vw; max-height:78vh; width:auto; border-radius:10px;}
+  #lb-cap{color:#dfe5ea; font-size:1.2rem; margin-top:1rem;}
+  .lb-controls{display:flex; gap:1rem; margin-top:1.2rem;}
+  .lb-controls button{font-size:1.25rem; font-weight:700; padding:.8rem 1.6rem; border-radius:10px;
+    border:2px solid #56606a; background:#1a2027; color:#fff; cursor:pointer;}
+  .lb-controls button:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<nav aria-label="Main">
+  <a class="wordmark" href="#/" data-nav="home">Leeder<span>.</span></a>
+  <div class="links">
+    <a href="#/" data-nav="home" aria-current="page">Home</a>
+    <a href="#/bowdoin" data-nav="bowdoin">Beacon Hill</a>
+    <a href="#/cambridge" data-nav="cambridge">Cambridge</a>
+    <a href="#/perkins" data-nav="perkins">Jamaica Plain</a>
+    <a href="#/royal" data-nav="royal">Brookline</a>
+  </div>
+  <a class="applylink" href="#/apply" data-nav="apply">Apply</a>
+</nav>
+
+<main id="main">
+<!-- ================= HOME ================= -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <img loading="lazy" src="img/bowdoin-street-6.jpg" alt="Bright, sunlit apartment interior">
+    <div class="inner">
+      <img class="brandlogo" src="img/leeder-logo.png" alt="Leeder Management logo" width="210" height="99">
+      <span class="kicker">Boston · Cambridge · Brookline · Jamaica Plain</span>
+      <h1>Four neighborhoods.<br>Zero heating bills.</h1>
+      <p>Landmark apartments in the neighborhoods everyone wants: restored originals, modern kitchens, and heat and hot water always on us.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#/bowdoin" data-nav="bowdoin">Explore the buildings</a>
+        <a class="quietlink" href="tel:6172328700">Or call (617) 232-8700</a>
+      </div>
+    </div>
+  </div>
+
+  <section aria-labelledby="props">
+    <h2 id="props">Pick your neighborhood</h2>
+    <p class="sub">Every building has an on-site super, a real history, and a T stop close by. Click any card.</p>
+    <div class="cards">
+      <a class="card" href="#/bowdoin" data-nav="bowdoin">
+        <div class="imgwrap"><span class="chip">Beacon Hill</span>
+          <img loading="lazy" src="img/bowdoin-street-4.jpg" alt="Apartment at 122 Bowdoin Street"></div>
+        <div class="body"><h3>122 Bowdoin Street</h3>
+          <p>JFK's old address, across from the State House.</p>
+          <span class="rents" data-rentline="bowdoin">Studio&nbsp;$1,500–$1,550 · 1BR&nbsp;$2,700–$2,800 · 2BR&nbsp;$3,000–$3,200</span></div>
+      </a>
+      <a class="card" href="#/cambridge" data-nav="cambridge">
+        <div class="imgwrap"><span class="chip">Cambridge</span>
+          <img loading="lazy" src="img/concord-avenue-5.jpg" alt="Craigie Arms on Concord Avenue"></div>
+        <div class="body"><h3>Craigie Arms &amp; 1 Craigie</h3>
+          <p>National Register building near Harvard Square.</p>
+          <span class="rents" data-rentline="cambridge">Studio&nbsp;$1,900–$2,200 · 1BR&nbsp;$2,450–$2,850 · 2BR&nbsp;$2,750–$3,100</span></div>
+      </a>
+      <a class="card" href="#/perkins" data-nav="perkins">
+        <div class="imgwrap"><span class="chip">Jamaica Plain</span>
+          <img loading="lazy" src="img/perkins-primary.avif" alt="Perkins Square apartments"></div>
+        <div class="body"><h3>Perkins Square</h3>
+          <p>More than a dozen buildings beside Jamaica Pond.</p>
+          <span class="rents" data-rentline="perkins">Studio&nbsp;$1,600 · 1BR&nbsp;$1,950 · 2BR&nbsp;$2,350 · 3BR&nbsp;$2,650</span></div>
+      </a>
+      <a class="card" href="#/royal" data-nav="royal">
+        <div class="imgwrap"><span class="chip">Brookline</span>
+          <img loading="lazy" src="img/brookline-neighborhood-1.jpeg" alt="Coolidge Corner, two blocks from The Royal"></div>
+        <div class="body"><h3>The Royal · 1469 Beacon</h3>
+          <p>Two blocks from Coolidge Corner, on the C line.</p>
+          <span class="rents" data-rentline="royal">Studio&nbsp;$1,750–$2,100 · 1BR&nbsp;$2,400 · 2BR&nbsp;$2,600 · 3BR&nbsp;$4,200 · 4BR&nbsp;$4,400–$4,500</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="values" aria-labelledby="why">
+    <h2 id="why">Why renters stay</h2>
+    <div class="grid">
+      <div><h3>Heat &amp; hot water included</h3><p>Every unit, every winter. No surprise bills.</p></div>
+      <div><h3>On-site superintendents</h3><p>A person who knows the building, not a ticket queue.</p></div>
+      <div><h3>Restored, not flattened</h3><p>Original hardwood and detail with modern kitchens and baths.</p></div>
+      <div><h3>Blue-chip locations</h3><p>Beacon Hill, Harvard Square, Coolidge Corner, Jamaica Pond.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= BOWDOIN ================= -->
+<div class="page" id="page-bowdoin">
+  <div class="prop-head">
+    <div>
+      <span class="kicker">Beacon Hill · Boston</span>
+      <h1>122 Bowdoin Street</h1>
+      <p>Nine stories of 1926 brick and limestone across from the Massachusetts State House, and John F. Kennedy's official Boston address from 1946 until his death.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#bowdoin-rents">Current rents</a>
+        <a class="btn outline" href="#/apply" data-nav="apply">Apply online</a>
+      </div>
+    </div>
+    <img loading="lazy" src="img/bowdoin-street-1.jpg" alt="122 Bowdoin Street exterior facing the State House">
+  </div>
+  <section id="bowdoin-rents" style="padding-bottom:0;">
+    <div class="rents-wrap">
+      <h2>Current rents</h2>
+      <table><thead><tr><th scope="col">Unit</th><th scope="col">Monthly rent</th></tr></thead>
+        <tbody data-rents="bowdoin">
+          <tr><td>Studio</td><td class="price">$1,500–$1,550</td></tr>
+          <tr><td>1 Bedroom</td><td class="price">$2,700–$2,800</td></tr>
+          <tr><td>2 Bedroom</td><td class="price">$3,000–$3,200</td></tr>
+        </tbody></table>
+      <span class="livebadge">Showing saved prices</span>
+      <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
+    </div>
+    <div class="amen"><span>On-site laundry</span><span>Elevator</span><span>Hardwood floors</span><span>Modern kitchens</span><span>Red / Green / Blue lines</span><span>On-site super</span></div>
+  </section>
+  <section>
+    <h2>Inside the building</h2>
+    <p class="gal-hint">Click any photo to view it full screen.</p>
+    <div class="gallery" data-gallery="bowdoin"></div>
+  </section>
+</div>
+
+<!-- ================= CAMBRIDGE ================= -->
+<div class="page" id="page-cambridge">
+  <div class="prop-head">
+    <div>
+      <span class="kicker">Cambridge · Near Harvard Square</span>
+      <h1>Craigie Arms &amp; 1 Craigie Street</h1>
+      <p>A National Register landmark and its neighbor, minutes from Harvard Square, the Charles, and the Brattle Street mansions. New elevators, on-site laundry, Red Line close.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#cambridge-rents">Current rents</a>
+        <a class="btn outline" href="#/apply" data-nav="apply">Apply online</a>
+      </div>
+    </div>
+    <img loading="lazy" src="img/concord-avenue-1.png" alt="Craigie Arms building exterior">
+  </div>
+  <section id="cambridge-rents" style="padding-bottom:0;">
+    <div class="rents-wrap">
+      <h2>Current rents</h2>
+      <table><thead><tr><th scope="col">Unit</th><th scope="col">Monthly rent</th></tr></thead>
+        <tbody data-rents="cambridge">
+          <tr><td>Studio</td><td class="price">$1,900–$2,200</td></tr>
+          <tr><td>1 Bedroom</td><td class="price">$2,450–$2,850</td></tr>
+          <tr><td>2 Bedroom</td><td class="price">$2,750–$3,100</td></tr>
+        </tbody></table>
+      <span class="livebadge">Showing saved prices</span>
+      <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
+    </div>
+    <div class="amen"><span>New elevators</span><span>On-site laundry</span><span>Hardwood floors</span><span>Ample closets</span><span>Red Line + buses</span><span>On-site super</span></div>
+  </section>
+  <section>
+    <h2>Inside the buildings</h2>
+    <p class="gal-hint">Click any photo to view it full screen.</p>
+    <div class="gallery" data-gallery="cambridge"></div>
+  </section>
+</div>
+
+<!-- ================= PERKINS ================= -->
+<div class="page" id="page-perkins">
+  <div class="prop-head">
+    <div>
+      <span class="kicker">Jamaica Plain · By the Pond</span>
+      <h1>Perkins Square</h1>
+      <p>A community of more than a dozen buildings beside Jamaica Pond, a short walk to Centre Street's restaurants and shops. Gleaming hardwood, modern kitchens and baths, off-street reserved parking.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#perkins-rents">Current rents</a>
+        <a class="btn outline" href="#/apply" data-nav="apply">Apply online</a>
+      </div>
+    </div>
+    <img loading="lazy" src="img/perkins-building.avif" alt="Perkins Square building exterior">
+  </div>
+  <section id="perkins-rents" style="padding-bottom:0;">
+    <div class="rents-wrap">
+      <h2>Current rents</h2>
+      <table><thead><tr><th scope="col">Unit</th><th scope="col">Monthly rent</th></tr></thead>
+        <tbody data-rents="perkins">
+          <tr><td>Studio</td><td class="price">$1,600</td></tr>
+          <tr><td>1 Bedroom</td><td class="price">$1,950</td></tr>
+          <tr><td>2 Bedroom</td><td class="price">$2,350</td></tr>
+          <tr><td>3 Bedroom</td><td class="price">$2,650</td></tr>
+        </tbody></table>
+      <span class="livebadge">Showing saved prices</span>
+      <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included. Superintendent: (617) 524-1695.</p>
+    </div>
+    <div class="amen"><span>Reserved parking</span><span>On-site laundry</span><span>Hardwood floors</span><span>Modern kitchens</span><span>MBTA buses</span><span>On-site super</span></div>
+  </section>
+  <section>
+    <h2>Around the building</h2>
+    <p class="gal-hint">Click any photo to view it full screen. Jamaica Pond and its boathouse are part of Boston's <a href="https://www.emeraldnecklace.org/">Emerald Necklace</a>, a block away.</p>
+    <div class="gallery" data-gallery="perkins"></div>
+  </section>
+</div>
+
+<!-- ================= ROYAL ================= -->
+<div class="page" id="page-royal">
+  <div class="prop-head">
+    <div>
+      <span class="kicker">Brookline · Coolidge Corner</span>
+      <h1>The Royal · 1469 Beacon Street</h1>
+      <p>Two blocks from Coolidge Corner's shops, restaurants, and independent theater, with the Green Line C at the door: Boston College, BU, and downtown without a car.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#royal-rents">Current rents</a>
+        <a class="btn outline" href="#/apply" data-nav="apply">Apply online</a>
+      </div>
+    </div>
+    <img loading="lazy" src="img/brookline-neighborhood-1.jpeg" alt="Coolidge Corner neighborhood, Brookline">
+  </div>
+  <section id="royal-rents" style="padding-bottom:0;">
+    <div class="rents-wrap">
+      <h2>Current rents</h2>
+      <table><thead><tr><th scope="col">Unit</th><th scope="col">Monthly rent</th></tr></thead>
+        <tbody data-rents="royal">
+          <tr><td>Studio</td><td class="price">$1,750–$2,100</td></tr>
+          <tr><td>1 Bedroom</td><td class="price">$2,400</td></tr>
+          <tr><td>2 Bedroom</td><td class="price">$2,600</td></tr>
+          <tr><td>3 Bedroom</td><td class="price">$4,200</td></tr>
+          <tr><td>4 Bedroom</td><td class="price">$4,400–$4,500</td></tr>
+        </tbody></table>
+      <span class="livebadge">Showing saved prices</span>
+      <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
+    </div>
+    <div class="amen"><span>Green Line C at door</span><span>On-site laundry</span><span>Restored originals</span><span>Coolidge Corner 2 blocks</span><span>On-site super</span></div>
+  </section>
+  <section>
+    <h2>The neighborhood</h2>
+    <p class="gal-hint">Two blocks to the <a href="https://coolidge.org/">Coolidge Corner Theatre</a>, Brookline Booksmith, and the shops and restaurants of Harvard Street. The super is happy to show units in person.</p>
+    <div class="gallery" data-gallery="royal"></div>
+  </section>
+</div>
+
+<!-- ================= APPLY ================= -->
+<div class="page" id="page-apply">
+  <section class="apply-intro" style="padding-bottom:0;">
+    <h2>Rental application</h2>
+    <p class="sub">Fill this out on screen, then choose a button at the bottom: send it straight to Meg by email, or print it (or save it as a PDF) to bring with you. Nothing is stored on this website.</p>
+    <p class="gal-hint">Prefer paper? <a href="application-rental.pdf">Download the original PDF form</a>.</p>
+  </section>
+  <section style="padding-top:1rem;">
+    <form class="appform" id="appform">
+      <fieldset><legend>About you</legend>
+        <div class="frow">
+          <label>Full name <input name="Name" autocomplete="name"></label>
+          <label>Date of birth <input name="Date of birth" autocomplete="bday" placeholder="MM/DD/YYYY"></label>
+          <label>Cell phone <input name="Cell phone" type="tel" autocomplete="tel"></label>
+          <label>Email <input name="Email" type="email" autocomplete="email"></label>
+          <label>Driver's license # <input name="License #"></label>
+          <label>Social Security # <input name="SSN" data-private="1" placeholder="Leave blank if emailing"></label>
+        </div>
+        <p class="hint">For your security, the Social Security number is never included in the email. Provide it on the printed copy or at lease signing.</p>
+      </fieldset>
+      <fieldset><legend>Which building?</legend>
+        <div class="frow">
+          <label>Property
+            <select name="Property">
+              <option>Perkins Square, Jamaica Plain</option>
+              <option>The Royal, 1469 Beacon St, Brookline</option>
+              <option>Craigie Arms / 1 Craigie St, Cambridge</option>
+              <option>122 Bowdoin St, Beacon Hill</option>
+            </select></label>
+          <label>Apartment # (if known) <input name="Apartment #"></label>
+          <label>Total occupants <input name="Total occupants" inputmode="numeric"></label>
+          <label>Adults <input name="Adults" inputmode="numeric"></label>
+          <label>Children <input name="Children" inputmode="numeric"></label>
+        </div>
+        <div class="frow">
+          <label>Names and ages of minor children <input name="Minor children"></label>
+          <label>Co-tenants (each adult files separately) <input name="Co-tenants"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Where you live now</legend>
+        <div class="frow">
+          <label>Present address <input name="Present address" autocomplete="street-address"></label>
+          <label>City <input name="City"></label>
+          <label>State <input name="State"></label>
+          <label>Zip <input name="Zip" autocomplete="postal-code"></label>
+          <label>Living there from <input name="Occupancy from" placeholder="MM/YYYY"></label>
+          <label>To <input name="Occupancy to" placeholder="MM/YYYY or present"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Landlords</legend>
+        <div class="frow">
+          <label>Present landlord <input name="Present landlord"></label>
+          <label>Their phone <input name="Present landlord phone" type="tel"></label>
+          <label>Their address <input name="Present landlord address"></label>
+          <label>Former landlord <input name="Former landlord"></label>
+          <label>Their phone <input name="Former landlord phone" type="tel"></label>
+          <label>Their address <input name="Former landlord address"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Employment</legend>
+        <div class="frow">
+          <label>Current employer <input name="Current employer"></label>
+          <label>Employer address <input name="Employer address"></label>
+          <label>Employer phone <input name="Employer phone" type="tel"></label>
+          <label>Occupation <input name="Occupation"></label>
+          <label>Salary <input name="Salary"></label>
+          <label>Length of employment <input name="Length of employment"></label>
+          <label>Former employer <input name="Former employer"></label>
+          <label>Former employer phone <input name="Former employer phone" type="tel"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>References</legend>
+        <div class="frow">
+          <label>Personal reference <input name="Personal reference"></label>
+          <label>Reference phone <input name="Reference phone" type="tel"></label>
+          <label>Emergency contact <input name="Emergency contact"></label>
+          <label>Emergency phone <input name="Emergency phone" type="tel"></label>
+          <label>Credit reference <input name="Credit reference"></label>
+          <label>Credit card # <input name="Credit card #" data-private="1" placeholder="Leave blank if emailing"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Disclosures</legend>
+        <div class="frow">
+          <label>Have you been convicted of a felony?
+            <select name="Felony conviction"><option>No</option><option>Yes</option></select></label>
+          <label>Are you a registered sex offender?
+            <select name="Registered offender"><option>No</option><option>Yes</option></select></label>
+        </div>
+        <div class="frow">
+          <label>If yes to either, details <textarea name="Conviction details"></textarea></label>
+        </div>
+        <p class="hint">Base rent is due on the first of each month in advance. The applicant authorizes Leeder Management to obtain a consumer credit report and conduct a criminal background check, per the terms on the printed form. Submitting this application confirms the information given is true.</p>
+      </fieldset>
+      <div class="privacy">Your answers stay on your device. Emailing opens your own mail app with the application filled in, addressed to Meg at Leeder Management. Sensitive numbers are left out of email on purpose.</div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="emailapp">Email application to Meg</button>
+        <button type="button" class="btn outline" id="printapp">Print or save as PDF</button>
+      </div>
+    </form>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="cols">
+    <div><img class="brandlogo" src="img/leeder-logo.png" alt="Leeder Management logo" width="210" height="99" style="height:48px; margin-bottom:.8rem;">
+      <p>318 Harvard Street, Rm. 23<br>Brookline, MA 02446</p></div>
+    <div><p><a href="tel:6172328700">(617) 232-8700</a><br>
+      <a href="mailto:mlbuckley@leedermgt.com">mlbuckley@leedermgt.com</a></p></div>
+    <div><p><a href="application-rental.pdf">Rental application (PDF)</a></p></div>
+  </div>
+  <p class="note">Design prototype v2. Rents load live from the Leeder Rents Google Sheet when reachable.</p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <img id="lb-img" alt="">
+  <p id="lb-cap"></p>
+  <div class="lb-controls">
+    <button id="lb-prev">← Previous</button>
+    <button id="lb-close">Close (Esc)</button>
+    <button id="lb-next">Next →</button>
+  </div>
+</div>
+
+<script>
+/* ---------- galleries (all images vendored in img/) ---------- */
+const GALLERIES={
+  bowdoin:[
+    ['img/bowdoin-street-2.jpg','Renovated kitchen'],
+    ['img/bowdoin-street-3.jpg','Living area with hardwood floors'],
+    ['img/bowdoin-street-4.jpg','Bedroom with large windows'],
+    ['img/bowdoin-street-5.jpg','Sunlit interior'],
+    ['img/bowdoin-street-6.jpg','Living room detail'],
+    ['img/bowdoin-street-1.jpg','Exterior at the State House'],
+    ['img/beacon-hill-neighborhood.jpg','Beacon Hill, out the front door']
+  ],
+  cambridge:[
+    ['img/concord-avenue-1.png','Craigie Arms exterior'],
+    ['img/concord-ave-2.png','Building entrance'],
+    ['img/concord-avenue-3.png','Facade detail'],
+    ['img/concord-avenue-4.jpg','Concord Avenue view'],
+    ['img/concord-avenue-5.jpg','The building in context'],
+    ['img/craigie-arms-1.jpg','Craigie Arms street view'],
+    ['img/craigie-arms-3.avif','Craigie Arms angle view'],
+    ['img/craigie-arms-4.avif','Craigie Arms detail'],
+    ['img/cambridge-neighborhood.jpg','The Cambridge neighborhood']
+  ],
+  perkins:[
+    ['img/perkins-primary.avif','Perkins Square'],
+    ['img/perkins-building.avif','Building exterior'],
+    ['img/perkins-balcony.avif','Balcony'],
+    ['img/jamaica-plain-neighborhood.png','Jamaica Pond, a block away']
+  ],
+  royal:[
+    ['img/brookline-neighborhood-1.jpeg','Coolidge Corner, two blocks away'],
+    ['img/cambridge-neighborhood.jpg','On the Green Line C: Boston and Cambridge without a car']
+  ]
+};
+let lbList=[], lbIndex=0;
+Object.entries(GALLERIES).forEach(([key,items])=>{
+  const wrap=document.querySelector(`[data-gallery="${key}"]`); if(!wrap) return;
+  items.forEach(([src,cap],i)=>{
+    const b=document.createElement('button');
+    b.setAttribute('aria-label','View photo: '+cap);
+    b.innerHTML=`<img loading="lazy" src="${src}" alt="${cap}">`;
+    b.addEventListener('click',()=>openLB(items,i));
+    wrap.appendChild(b);
+  });
+});
+const lb=document.getElementById('lightbox'), lbImg=document.getElementById('lb-img'), lbCap=document.getElementById('lb-cap');
+function openLB(list,i){ lbList=list; lbIndex=i; renderLB(); lb.classList.add('open'); document.getElementById('lb-close').focus(); }
+function renderLB(){ const [src,cap]=lbList[lbIndex]; lbImg.src=src; lbImg.alt=cap; lbCap.textContent=cap+'  ('+(lbIndex+1)+' of '+lbList.length+')'; }
+function stepLB(d){ lbIndex=(lbIndex+d+lbList.length)%lbList.length; renderLB(); }
+document.getElementById('lb-prev').onclick=()=>stepLB(-1);
+document.getElementById('lb-next').onclick=()=>stepLB(1);
+document.getElementById('lb-close').onclick=()=>lb.classList.remove('open');
+document.addEventListener('keydown',e=>{
+  if(!lb.classList.contains('open')) return;
+  if(e.key==='Escape') lb.classList.remove('open');
+  if(e.key==='ArrowLeft') stepLB(-1);
+  if(e.key==='ArrowRight') stepLB(1);
+});
+
+/* ---------- hash routing ---------- */
+const ROUTES=['home','bowdoin','cambridge','perkins','royal','apply'];
+function route(){
+  let key=(location.hash||'#/').replace('#/','')||'home';
+  if(!ROUTES.includes(key)) key='home';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('nav [data-nav]').forEach(a=>a.toggleAttribute('aria-current',a.dataset.nav===key));
+  const phone=matchMedia('(max-width:700px)').matches;
+  window.scrollTo({top:phone?document.getElementById('main').offsetTop:0});
+}
+window.addEventListener('hashchange',route);
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-nav]');
+  if(a){ location.hash='#/'+ (a.dataset.nav==='home'?'':a.dataset.nav); }
+});
+route();
+
+/* ---------- application: email to Meg or print ---------- */
+function appBody(){
+  const skip=new Set(['SSN','Credit card #']);
+  const lines=[];
+  document.querySelectorAll('#appform input, #appform select, #appform textarea').forEach(el=>{
+    if(skip.has(el.name)) return;
+    const v=(el.value||'').trim();
+    if(v) lines.push(el.name+': '+v);
+  });
+  return lines.join('\n');
+}
+document.getElementById('emailapp').addEventListener('click',()=>{
+  const name=(document.querySelector('#appform [name="Name"]').value||'applicant').trim();
+  const prop=document.querySelector('#appform [name="Property"]').value;
+  const subject='Rental application: '+name+' ('+prop+')';
+  const body='Hello Meg,\n\nPlease find my rental application below.\n\n'+appBody()+
+    '\n\nI understand the terms on the application form and confirm this information is true.\n';
+  location.href='mailto:mlbuckley@leedermgt.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+});
+document.getElementById('printapp').addEventListener('click',()=>{ window.print(); });
+
+/* ---------- live rents from Google Sheet (only on real hosts; offline-safe) ---------- */
+const SHEET_ID='1FUsWJI9MjuG2P_VWChVxBb1Cip4ui3dEIgb7yaJH_Pg';
+const LIVE_HOST=/(\.github\.io|leedermanagement\.com)$/.test(location.hostname);
+if(LIVE_HOST)
+fetch('https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json')
+  .then(r=>r.text()).then(t=>{
+    const json=JSON.parse(t.substring(t.indexOf('(')+1,t.lastIndexOf(')')));
+    const rows=json.table.rows.map(r=>({key:r.c[0]&&r.c[0].v,unit:r.c[2]&&r.c[2].v,rent:r.c[3]&&(r.c[3].f||r.c[3].v)})).filter(r=>r.key&&r.rent);
+    ROUTES.slice(1).forEach(k=>{
+      const mine=rows.filter(r=>r.key===k);
+      const tb=document.querySelector(`[data-rents="${k}"]`);
+      if(mine.length&&tb) tb.innerHTML=mine.map(r=>`<tr><td>${r.unit}</td><td class="price">${r.rent}</td></tr>`).join('');
+      const line=document.querySelector(`[data-rentline="${k}"]`);
+      if(mine.length&&line) line.textContent=mine.map(r=>(r.unit+' '+r.rent).split(' ').join(' ')).join(' · ');
+    });
+    document.querySelectorAll('.livebadge').forEach(b=>{b.textContent='Prices live from Google Sheet'; b.classList.add('live');});
+  }).catch(()=>{});
+</script>
+</body>
+</html>

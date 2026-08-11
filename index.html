@@ -23,8 +23,9 @@
   /* NAV */
   nav{position:sticky; top:0; z-index:30; background:rgba(251,251,249,.94); backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line); display:flex; align-items:center; gap:1.6rem; padding:.8rem 4vw; flex-wrap:wrap;}
-  .wordmark{font-weight:800; font-size:1.15rem; letter-spacing:.01em; color:var(--ink); text-decoration:none; display:inline-block; padding:.65rem .1rem; max-width:85px;}
-  .wordmark span{color:var(--teal);}
+  .wordmark{display:inline-flex; align-items:center; background:#12161b; border-radius:10px;
+    padding:.5rem .7rem; text-decoration:none;}
+  .wordmark img{height:36px; width:auto; display:block;}
   nav .links{display:flex; gap:.4rem; flex-wrap:wrap;}
   nav .links a{color:var(--text); text-decoration:none; font-size:1.125rem; font-weight:500;
     padding:.8rem 1.1rem; border-radius:99px;}
@@ -37,36 +38,13 @@
   .btn.primary{background:var(--teal); color:#fff;}
   .btn.primary:hover{background:var(--teal-dark);}
   .btn.light{background:#fff; color:var(--ink); border-color:#fff;}
-  .btn.outline{border-color:var(--ink); color:var(--ink);}
+  .btn.outline{background:transparent; border-color:var(--ink); color:var(--ink);}
   .btn:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
   .applylink{margin-left:auto; font-weight:500; font-size:1.125rem; color:var(--teal-dark); text-underline-offset:5px; padding:.8rem .6rem;}
   .quietlink{color:#dbe4e8; font-size:1.15rem; text-underline-offset:5px; padding:.85rem .4rem; align-self:center;}
   .applylink:focus-visible,.quietlink:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
 
   html{color-scheme:light dark;}
-  @media (prefers-color-scheme:dark){
-    :root{
-      --bg:#0f1317; --ink:#0b0e12; --text:#e4e9ee; --dim:#aab4bf;
-      --teal:#1487a0; --teal-dark:#8fd8e6; --sky:#152730; --line:#2a333d; --white:#181f27;
-    }
-    nav{background:rgba(15,19,23,.94);}
-    .wordmark{color:#f2f6f9;}
-    nav .links a{color:#e4e9ee;}
-    h2,.prop-head h1{color:#f2f6f9;}
-    .card h3{color:#f2f6f9;}
-    .card .chip{background:rgba(15,19,23,.9); color:#f2f6f9;}
-    td.price{color:#f2f6f9;}
-    thead th{background:#0c5666;}
-    .btn.light{background:#f2f6f9; color:#12161b; border-color:#f2f6f9;}
-    .btn.outline{border-color:#e4e9ee; color:#e4e9ee;}
-    .livebadge{background:#2c3640; color:#cfd8e0;}
-    .livebadge.live{background:#1f8a52; color:#fff;}
-    .values,footer{background:#0b0e12;}
-    .kicker{background:#0c5666;}
-    .btn.primary{background:#0c5666;}
-    .btn.primary:hover{background:#0a4552;}
-    .appform legend{color:#f2f6f9;}
-  }
 
   /* Explicit light ladder: html[data-light="dusk"|"night"] mirrors the dark palette */
   html[data-light="dusk"], html[data-light="night"]{
@@ -109,7 +87,7 @@
   .cta-row{display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;}
   @media (max-width:700px){
     nav{position:static; gap:.4rem .8rem; padding:.5rem 4vw .6rem;}
-    .wordmark{padding:.5rem .1rem;}
+    .wordmark{padding:.5rem .6rem;}
     nav .links{gap:.1rem .2rem;}
     nav .links a{padding:.55rem .7rem;}
     .applylink{padding:.55rem .5rem;}
@@ -195,7 +173,13 @@
   .appform{max-width:52rem;}
   .appform fieldset{border:1px solid var(--line); border-radius:14px; padding:1.4rem 1.5rem 1.6rem; margin-top:1.8rem; background:var(--white);}
   .appform legend{font-weight:800; font-size:1.3rem; color:var(--ink); padding:0 .5rem;}
-  .appform .frow{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem 1.2rem; margin-top:.9rem;}
+  /* TWO COLUMNS, on purpose. auto-fit reflowed to three at this form width and split
+     labelled pairs across rows (emergency contact in one row, its phone in the next).
+     A pair the reader has to hunt for is a pair they will mis-fill. */
+  .appform .frow{display:grid; grid-template-columns:repeat(2,1fr); gap:1rem 1.2rem; margin-top:.9rem;}
+  .appform .frow.three{grid-template-columns:repeat(3,1fr);}
+  .appform .full{grid-column:1/-1;}
+  @media (max-width:640px){ .appform .frow, .appform .frow.three{grid-template-columns:1fr;} }
   .appform label{display:block; font-weight:600; font-size:1.125rem; color:var(--text);}
   .appform input,.appform select,.appform textarea{display:block; width:100%; margin-top:.35rem;
     font:inherit; font-size:1.125rem; color:var(--text); background:var(--bg);
@@ -227,12 +211,39 @@
   .lb-controls button{font-size:1.25rem; font-weight:700; padding:.8rem 1.6rem; border-radius:10px;
     border:2px solid #56606a; background:#1a2027; color:#fff; cursor:pointer;}
   .lb-controls button:focus-visible{outline:4px solid var(--teal); outline-offset:3px;}
+  /* SYSTEM DARK MODE. Must be LAST in this sheet: a media query adds no specificity,
+     so any equal-specificity base rule declared later silently wins. That is exactly how
+     .card h3 and td.price rendered near-black on the dark card (founder report 2026-08-11). */
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0f1317; --ink:#0b0e12; --text:#e4e9ee; --dim:#aab4bf;
+      --teal:#1487a0; --teal-dark:#8fd8e6; --sky:#152730; --line:#2a333d; --white:#181f27;
+    }
+    nav{background:rgba(15,19,23,.94);}
+    .wordmark{color:#f2f6f9;}
+    nav .links a{color:#e4e9ee;}
+    h2,.prop-head h1{color:#f2f6f9;}
+    .card h3{color:#f2f6f9;}
+    .card .chip{background:rgba(15,19,23,.9); color:#f2f6f9;}
+    td.price{color:#f2f6f9;}
+    thead th{background:#0c5666;}
+    .btn.light{background:#f2f6f9; color:#12161b; border-color:#f2f6f9;}
+    .btn.outline{border-color:#e4e9ee; color:#e4e9ee;}
+    .livebadge{background:#2c3640; color:#cfd8e0;}
+    .livebadge.live{background:#1f8a52; color:#fff;}
+    .values,footer{background:#0b0e12;}
+    .kicker{background:#0c5666;}
+    .btn.primary{background:#0c5666;}
+    .btn.primary:hover{background:#0a4552;}
+    .appform legend{color:#f2f6f9;}
+  }
+
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <nav aria-label="Main">
-  <a class="wordmark" href="#/" data-nav="home">Leeder<span>.</span></a>
+  <a class="wordmark" href="#/" data-nav="home"><img src="img/leeder-logo.png" alt="Leeder Management home" width="210" height="99"></a>
   <div class="links">
     <a href="#/" data-nav="home" aria-current="page">Home</a>
     <a href="#/bowdoin" data-nav="bowdoin">Beacon Hill</a>
@@ -249,9 +260,8 @@
   <div class="hero">
     <img loading="lazy" src="img/bowdoin-street-6.jpg" alt="Bright, sunlit apartment interior">
     <div class="inner">
-      <img class="brandlogo" src="img/leeder-logo.png" alt="Leeder Management logo" width="210" height="99">
       <span class="kicker">Boston · Cambridge · Brookline · Jamaica Plain</span>
-      <h1>Four neighborhoods.<br>Zero heating bills.</h1>
+      <h1>Four neighborhoods.<br>$0 in heating bills.</h1>
       <p>Landmark apartments in the neighborhoods everyone wants: restored originals, modern kitchens, and heat and hot water always on us.</p>
       <div class="cta-row">
         <a class="btn primary" href="#/bowdoin" data-nav="bowdoin">Explore the buildings</a>
@@ -312,7 +322,7 @@
     <div>
       <span class="kicker">Beacon Hill · Boston</span>
       <h1>122 Bowdoin Street</h1>
-      <p>Nine stories of 1926 brick and limestone across from the Massachusetts State House, and John F. Kennedy's official Boston address from 1946 until his death.</p>
+      <p>Nine stories of 1926 brick and limestone across from the Massachusetts State House, and John F. Kennedy's official Boston address from 1946 on.</p>
       <div class="cta-row">
         <a class="btn primary" href="#bowdoin-rents">Current rents</a>
         <a class="btn outline" href="#/apply" data-nav="apply">Apply online</a>
@@ -329,7 +339,6 @@
           <tr><td>1 Bedroom</td><td class="price">$2,700–$2,800</td></tr>
           <tr><td>2 Bedroom</td><td class="price">$3,000–$3,200</td></tr>
         </tbody></table>
-      <span class="livebadge">Showing saved prices</span>
       <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
     </div>
     <div class="amen"><span>On-site laundry</span><span>Elevator</span><span>Hardwood floors</span><span>Modern kitchens</span><span>Red / Green / Blue lines</span><span>On-site super</span></div>
@@ -364,7 +373,6 @@
           <tr><td>1 Bedroom</td><td class="price">$2,450–$2,850</td></tr>
           <tr><td>2 Bedroom</td><td class="price">$2,750–$3,100</td></tr>
         </tbody></table>
-      <span class="livebadge">Showing saved prices</span>
       <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
     </div>
     <div class="amen"><span>New elevators</span><span>On-site laundry</span><span>Hardwood floors</span><span>Ample closets</span><span>Red Line + buses</span><span>On-site super</span></div>
@@ -400,7 +408,6 @@
           <tr><td>2 Bedroom</td><td class="price">$2,350</td></tr>
           <tr><td>3 Bedroom</td><td class="price">$2,650</td></tr>
         </tbody></table>
-      <span class="livebadge">Showing saved prices</span>
       <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included. Superintendent: (617) 524-1695.</p>
     </div>
     <div class="amen"><span>Reserved parking</span><span>On-site laundry</span><span>Hardwood floors</span><span>Modern kitchens</span><span>MBTA buses</span><span>On-site super</span></div>
@@ -437,7 +444,6 @@
           <tr><td>3 Bedroom</td><td class="price">$4,200</td></tr>
           <tr><td>4 Bedroom</td><td class="price">$4,400–$4,500</td></tr>
         </tbody></table>
-      <span class="livebadge">Showing saved prices</span>
       <p class="gal-hint" style="margin-top:1rem;">Heat and hot water included.</p>
     </div>
     <div class="amen"><span>Green Line C at door</span><span>On-site laundry</span><span>Restored originals</span><span>Coolidge Corner 2 blocks</span><span>On-site super</span></div>
@@ -471,7 +477,7 @@
       </fieldset>
       <fieldset><legend>Which building?</legend>
         <div class="frow">
-          <label>Property
+          <label class="full">Property
             <select name="Property">
               <option>Perkins Square, Jamaica Plain</option>
               <option>The Royal, 1469 Beacon St, Brookline</option>
@@ -484,38 +490,42 @@
           <label>Children <input name="Children" inputmode="numeric"></label>
         </div>
         <div class="frow">
-          <label>Names and ages of minor children <input name="Minor children"></label>
-          <label>Co-tenants (each adult files separately) <input name="Co-tenants"></label>
+          <label class="full">Names and ages of minor children <input name="Minor children"></label>
+          <label class="full">Co-tenants (each adult files separately) <input name="Co-tenants"></label>
         </div>
       </fieldset>
       <fieldset><legend>Where you live now</legend>
         <div class="frow">
-          <label>Present address <input name="Present address" autocomplete="street-address"></label>
+          <label class="full">Present address <input name="Present address" autocomplete="street-address"></label>
+        </div>
+        <div class="frow three">
           <label>City <input name="City"></label>
           <label>State <input name="State"></label>
           <label>Zip <input name="Zip" autocomplete="postal-code"></label>
+        </div>
+        <div class="frow">
           <label>Living there from <input name="Occupancy from" placeholder="MM/YYYY"></label>
-          <label>To <input name="Occupancy to" placeholder="MM/YYYY or present"></label>
+          <label>Living there until <input name="Occupancy to" placeholder="MM/YYYY or present"></label>
         </div>
       </fieldset>
       <fieldset><legend>Landlords</legend>
         <div class="frow">
           <label>Present landlord <input name="Present landlord"></label>
-          <label>Their phone <input name="Present landlord phone" type="tel"></label>
-          <label>Their address <input name="Present landlord address"></label>
+          <label>Present landlord phone <input name="Present landlord phone" type="tel"></label>
+          <label class="full">Present landlord address <input name="Present landlord address"></label>
           <label>Former landlord <input name="Former landlord"></label>
-          <label>Their phone <input name="Former landlord phone" type="tel"></label>
-          <label>Their address <input name="Former landlord address"></label>
+          <label>Former landlord phone <input name="Former landlord phone" type="tel"></label>
+          <label class="full">Former landlord address <input name="Former landlord address"></label>
         </div>
       </fieldset>
       <fieldset><legend>Employment</legend>
         <div class="frow">
           <label>Current employer <input name="Current employer"></label>
-          <label>Employer address <input name="Employer address"></label>
           <label>Employer phone <input name="Employer phone" type="tel"></label>
+          <label class="full">Employer address <input name="Employer address"></label>
           <label>Occupation <input name="Occupation"></label>
           <label>Salary <input name="Salary"></label>
-          <label>Length of employment <input name="Length of employment"></label>
+          <label class="full">Length of employment <input name="Length of employment"></label>
           <label>Former employer <input name="Former employer"></label>
           <label>Former employer phone <input name="Former employer phone" type="tel"></label>
         </div>
@@ -560,7 +570,7 @@
       <a href="mailto:mlbuckley@leedermgt.com">mlbuckley@leedermgt.com</a></p></div>
     <div><p><a href="application-rental.pdf">Rental application (PDF)</a></p></div>
   </div>
-  <p class="note">Design prototype v2. Rents load live from the Leeder Rents Google Sheet when reachable.</p>
+  <p class="note">Heat and hot water are included at every address. Rents shown are current asking rents.</p>
 </footer>
 
 <!-- LIGHTBOX -->
@@ -687,7 +697,6 @@ fetch('https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json'
       const line=document.querySelector(`[data-rentline="${k}"]`);
       if(mine.length&&line) line.textContent=mine.map(r=>(r.unit+' '+r.rent).split(' ').join(' ')).join(' · ');
     });
-    document.querySelectorAll('.livebadge').forEach(b=>{b.textContent='Prices live from Google Sheet'; b.classList.add('live');});
   }).catch(()=>{});
 </script>
 </body>

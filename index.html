@@ -114,6 +114,15 @@
 
   section{padding:4.5rem 5vw;}
   h2{font-size:clamp(1.9rem,3.4vw,2.6rem); font-weight:800; letter-spacing:-.01em; color:var(--ink);}
+  /* Apply and Contact had NO h1 at all - they opened at h2, so a screen-reader user landing there
+     got a document with no title. They now carry a real h1, which must NOT inherit the hero h1
+     (white, clamped to 3.4rem) or it would be invisible on a light page.
+     Colour is var(--text), NOT var(--ink). --ink is near-black in every palette, so in dark mode
+     it renders 1.04:1 on the dark page background - the contrast sweep caught exactly that on the
+     first build of this rule. h2 gets away with --ink only because a separate override list
+     restates it for dusk/night/system-dark, and that list is the thing people forget to update.
+     A token that flips with the palette needs no list. */
+  h1.pagetitle{font-size:clamp(1.9rem,3.4vw,2.6rem); font-weight:800; letter-spacing:-.01em; color:var(--text);}
   .sub{color:var(--dim); font-size:1.25rem; max-width:64ch; margin-top:.7rem;}
 
   /* HOME CARDS */
@@ -489,8 +498,9 @@
 <!-- ================= APPLY ================= -->
 <div class="page" id="page-apply">
   <section class="apply-intro" style="padding-bottom:0;">
-    <h2>Rental application</h2>
+    <h1 class="pagetitle">Rental application</h1>
     <p class="sub">Fill this out on screen, then save it as a PDF with the button at the bottom. We will show you how to email it to Meg, or you can bring it to the office. Nothing is stored on this website and nothing is sent from it.</p>
+    <p class="sub">There is no application fee. We do not charge for credit or background reports. Each adult who will sign the lease files a separate application.</p>
     <p class="gal-hint">Prefer paper? <a href="application-rental.pdf">Download the printable PDF form</a>.</p>
   </section>
   <section style="padding-top:1rem;">
@@ -505,21 +515,25 @@
       </fieldset>
       <fieldset><legend>Which building?</legend>
         <div class="frow">
-          <label class="full">Property
-            <select name="Property">
+          <label class="full">Building
+            <select name="Building">
+              <option value="">Please choose</option>
+              <option>122 Bowdoin Street, Beacon Hill</option>
+              <option>Craigie Arms and 1 Craigie Street, Cambridge</option>
               <option>Perkins Square, Jamaica Plain</option>
-              <option>The Royal, 1469 Beacon St, Brookline</option>
-              <option>Craigie Arms / 1 Craigie St, Cambridge</option>
-              <option>122 Bowdoin St, Beacon Hill</option>
+              <option>The Royal, 1469 Beacon Street, Brookline</option>
+              <option>Not sure yet</option>
             </select></label>
-          <label>Apartment # (if known) <input name="Apartment #"></label>
-          <label>Total occupants <input name="Total occupants" inputmode="numeric"></label>
-          <label>Adults <input name="Adults" inputmode="numeric"></label>
-          <label>Children <input name="Children" inputmode="numeric"></label>
+          <label>Apartment number (if you know it) <input name="Apartment number"></label>
+          <label>Desired move-in date <input name="Desired move-in date" placeholder="MM/DD/YYYY"></label>
+        </div>
+        <div class="frow three">
+          <label>How many people will live there, including you <input name="Total occupants" inputmode="numeric"></label>
+          <label>Adults 18 and over <input name="Adults" inputmode="numeric"></label>
+          <label>Children under 18 <input name="Children" inputmode="numeric"></label>
         </div>
         <div class="frow">
-          <label class="full">Names and ages of minor children <input name="Minor children"></label>
-          <label class="full">Co-tenants (each adult files separately) <input name="Co-tenants"></label>
+          <label class="full">Other adults who will sign the lease (each one files a separate application) <input name="Co-tenants"></label>
         </div>
       </fieldset>
       <fieldset><legend>Where you live now</legend>
@@ -534,7 +548,9 @@
         <div class="frow">
           <label>Living there from <input name="Occupancy from" placeholder="MM/YYYY"></label>
           <label>Living there until <input name="Occupancy to" placeholder="MM/YYYY or present"></label>
+          <label class="full">Monthly rent now <input name="Monthly rent now"></label>
         </div>
+        <p class="hint">Dates as month and year, for example 03/2024. If you still live there, write &ldquo;present&rdquo;.</p>
       </fieldset>
       <fieldset><legend>Landlords</legend>
         <div class="frow">
@@ -546,39 +562,58 @@
           <label class="full">Former landlord address <input name="Former landlord address"></label>
         </div>
       </fieldset>
-      <fieldset><legend>Employment</legend>
+      <fieldset><legend>Employment and income</legend>
         <div class="frow">
           <label>Current employer <input name="Current employer"></label>
           <label>Employer phone <input name="Employer phone" type="tel"></label>
           <label class="full">Employer address <input name="Employer address"></label>
           <label>Occupation <input name="Occupation"></label>
-          <label>Salary <input name="Salary"></label>
-          <label class="full">Length of employment <input name="Length of employment"></label>
+          <label>Type of business <input name="Type of business"></label>
+          <label class="full">How long you have worked there <input name="Length of employment"></label>
           <label>Former employer <input name="Former employer"></label>
           <label>Former employer phone <input name="Former employer phone" type="tel"></label>
         </div>
+        <div class="frow">
+          <label class="full">All sources of income and monthly amounts
+            <textarea name="Sources of income"></textarea></label>
+        </div>
+        <p class="hint">Include wages, self-employment, retirement, Social Security, SSI or SSDI, veterans&rsquo; benefits, child support, alimony, public assistance, and any rental assistance or housing subsidy. We accept housing vouchers. Any income standard we apply is applied only to your share of the rent.</p>
       </fieldset>
       <fieldset><legend>References</legend>
         <div class="frow">
-          <label>Personal reference <input name="Personal reference"></label>
-          <label>Reference phone <input name="Reference phone" type="tel"></label>
-          <label>Emergency contact <input name="Emergency contact"></label>
-          <label>Emergency phone <input name="Emergency phone" type="tel"></label>
-          <label class="full">Credit reference <input name="Credit reference"></label>
+          <label>Personal reference (name) <input name="Personal reference (name)"></label>
+          <label>Personal reference (phone) <input name="Personal reference (phone)" type="tel"></label>
+          <label>Emergency contact (name) <input name="Emergency contact (name)"></label>
+          <label>Emergency contact (phone) <input name="Emergency contact (phone)" type="tel"></label>
+          <label class="full">Credit reference (a bank, credit union, or card issuer) <input name="Credit reference"></label>
         </div>
+        <p class="hint">Please do not write an account number in the credit reference field. The name of the bank or issuer is all we need.</p>
       </fieldset>
       <fieldset><legend>Disclosures</legend>
         <div class="frow">
-          <label>Have you been convicted of a felony?
-            <select name="Felony conviction"><option>No</option><option>Yes</option></select></label>
+          <label>Have you ever been convicted of a felony?
+            <select name="Felony conviction">
+              <option value="">Please choose</option><option>No</option><option>Yes</option></select></label>
           <label>Are you a registered sex offender?
-            <select name="Registered offender"><option>No</option><option>Yes</option></select></label>
+            <select name="Registered offender">
+              <option value="">Please choose</option><option>No</option><option>Yes</option></select></label>
         </div>
         <div class="frow">
-          <label>If yes to either, details <textarea name="Conviction details"></textarea></label>
+          <label class="full">If yes to either, please explain <textarea name="Conviction details"></textarea></label>
         </div>
+        <p class="hint"><strong>Massachusetts law requires the following notice. In plain terms: if your record is sealed, you may answer &ldquo;no record&rdquo; here.</strong></p>
         <p class="hint">An applicant for employment or for housing or an occupational or professional license with a sealed record on file with the commissioner of probation may answer &ldquo;no record&rdquo; with respect to an inquiry herein relative to prior arrests, criminal court appearances or convictions.</p>
-        <p class="hint">Base rent is due on the first of each month in advance. The applicant authorizes Leeder Management to obtain a consumer credit report and conduct a criminal background check. Signing this application confirms the information given is true.</p>
+      </fieldset>
+      <fieldset><legend>Fair housing</legend>
+        <p class="hint">Leeder Management does not discriminate on the basis of race, including natural and protective hairstyles, color, religious creed, national origin, ancestry, sex, pregnancy, gender identity or expression, sexual orientation, age, marital status, familial status or the presence of children, disability, genetic information, veteran or active military status, or receipt of public assistance or a rental subsidy, including Section 8 and other housing vouchers. Reasonable accommodations and modifications are available on request; ask us at any point and you need not disclose a diagnosis. Assistance animals are not pets and are not subject to pet policies, fees, deposits, or breed or weight limits. Equal Housing Opportunity.</p>
+      </fieldset>
+      <fieldset><legend>Signature</legend>
+        <p class="hint">By signing below you authorize Leeder Management to obtain a consumer credit report and to conduct a criminal background check, and you confirm that the information you have given here is true and complete. If we take an adverse action based in whole or in part on a consumer report, we will send you a written notice naming the reporting agency and telling you how to obtain a free copy of the report and dispute it. Before the tenancy begins we may collect only the first month&rsquo;s rent, the last month&rsquo;s rent, a security deposit not exceeding one month&rsquo;s rent, and the actual cost of a new lock and key.</p>
+        <div class="frow">
+          <label>Applicant signature <input name="Applicant signature"></label>
+          <label>Date <input name="Date" placeholder="MM/DD/YYYY"></label>
+        </div>
+        <p class="hint">Sign the saved PDF, or sign it by hand after you print it.</p>
       </fieldset>
       <div class="privacy">Your answers stay on your device. This website does not store or send anything you type here. Saving the file and sending it are entirely under your control.</div>
       <div class="actions">
@@ -599,7 +634,7 @@
 <!-- ================= CONTACT ================= -->
 <div class="page" id="page-contact">
   <section class="apply-intro" style="padding-bottom:0;">
-    <h2>Contact us</h2>
+    <h1 class="pagetitle">Contact us</h1>
     <p class="sub">Questions about an apartment, an application, or a lease? Reach the office directly, or send a message below and it goes straight to Meg.</p>
   </section>
   <section style="padding-top:1rem;">
@@ -795,7 +830,11 @@ document.getElementById('printapp').addEventListener('click',()=>{
 document.getElementById('mailmeg').addEventListener('click',e=>{
   const f = document.getElementById('appform');
   const nm = (f.querySelector('[name="Name"]').value || '').trim();
-  const pr = f.querySelector('[name="Property"]').value;
+  // Renamed from "Property" to "Building" in v18 so the screen form matches the printed one.
+  // Read it defensively: an empty value is now possible, because the select gained a neutral
+  // "Please choose" first option - it used to silently default to Perkins Square.
+  const bEl = f.querySelector('[name="Building"]');
+  const pr = bEl ? bEl.value.trim() : '';
   const subject = 'Rental application' + (nm ? ' - ' + nm : '') + (pr ? ' (' + pr + ')' : '');
   const body = 'Hello Meg,\n\nMy completed rental application is attached as a PDF.\n\nThank you,\n' + (nm || '');
   e.currentTarget.href = 'mailto:mlbuckley@leedermgt.com?subject=' + encodeURIComponent(subject) +
